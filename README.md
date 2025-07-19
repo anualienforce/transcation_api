@@ -29,7 +29,7 @@ A responsive mobile app built using **Flutter** to view and add financial transa
 ## 🧪 Setup Instructions
 
 ```bash
-git clone https://github.com/yourusername/flutter-transactions-task.git
+git clone https://github.com/anualienforce/transcation_api.git
 cd flutter-transactions-task
 flutter pub get
 flutter run
@@ -49,25 +49,6 @@ flutter run
 
 Watch the full app walkthrough and explanation on Loom:  
 📽️ [https://loom.com/share/your-loom-link](https://loom.com/share/your-loom-link)
-
----
-
-## 🧠 App Structure & Logic
-
-- Uses `Provider` to manage transaction state and API logic.
-- Modular widget structure:
-  ```
-  lib/
-  ├── models/
-  ├── ui/
-  │   ├── screens/
-  │   ├── widgets/
-  ├── services/
-  ├── utils/
-  └── main.dart
-  ```
-- `formatters.dart` used for clean currency and date formatting.
-- Error and loading states handled via `enum ScreenState`.
 
 ---
 
@@ -93,13 +74,6 @@ Watch the full app walkthrough and explanation on Loom:
 - MockAPI doesn’t persist POST data permanently.
 - Needed to reformat UNIX timestamps to readable formats.
 - State syncing between new POST item and existing list.
-
----
-
-## 📲 APK Download
-
-Download the test build (React Native task):  
-🔗 [APK Download Link](https://drive.google.com/your-apk-link)
 
 ---
 
