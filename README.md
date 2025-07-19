@@ -6,8 +6,8 @@ A responsive mobile app built using **Flutter** to view and add financial transa
 
 ## 🔧 Tech Stack
 
-- **Flutter** 3.22.x
-- **Dart** 3.x
+- **Flutter** 3.29.3
+- **Dart** 3.7.2
 - **Provider** (State Management)
 - **MockAPI.io** for REST API
 - `intl` package for currency and date formatting
