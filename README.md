@@ -48,7 +48,7 @@ flutter run
 ## 🎥 Demo Walkthrough
 
 Watch the full app walkthrough and explanation on Loom:  
-📽️ [https://loom.com/share/your-loom-link](https://loom.com/share/your-loom-link)
+📽️ [video for intro](https://drive.google.com/file/d/1zJC4KlxYnc05HCqw8WWFRD_M5sk3i6RZ/view?pli=1)
 
 ---
 
