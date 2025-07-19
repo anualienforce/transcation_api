@@ -30,7 +30,7 @@ A responsive mobile app built using **Flutter** to view and add financial transa
 
 ```bash
 git clone https://github.com/anualienforce/transcation_api.git
-cd flutter-transactions-task
+cd transcation_api
 flutter pub get
 flutter run
 ```
