@@ -15,10 +15,11 @@ class ErrorApi extends StatelessWidget {
         ),
         body:  Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('$message'),
               ElevatedButton(onPressed: (){
-                onRetry;
+                onRetry();
               }, child: Text('Retry'))
             ],
           ),)

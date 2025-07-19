@@ -6,32 +6,59 @@ import 'package:flutter/material.dart';
 import '../api/transcation_api.dart';
 import '../models/transcation_model.dart';
 
-
-// The same enum we used before, now part of the provider's logic
 enum ScreenState { loading, success, empty, error }
 
 class TransactionProvider with ChangeNotifier {
   // --- Private State Variables ---
-  List<TransactionModel> _transactions = [];
-  ScreenState _screenState = ScreenState.loading;
+  List<TransactionModel> _allTransactions = []; // Holds ALL transactions from the API
+  ScreenState _baseScreenState = ScreenState.loading;
   String _errorMessage = '';
 
-  // --- Public Getters to Access State ---
-  // This prevents the UI from directly modifying the state list
-  List<TransactionModel> get transactions => _transactions;
-  ScreenState get screenState => _screenState;
+  // --- NEW: Filter State Variables ---
+  String? _selectedTypeFilter; // null means 'All'
+  String? _selectedCategoryFilter; // null means 'All'
+
+
+  // --- Public Getters for UI to read state ---
+
+  // NEW: Expose the current filter values so the UI can highlight the active filter
+  String? get selectedTypeFilter => _selectedTypeFilter;
+  String? get selectedCategoryFilter => _selectedCategoryFilter;
   String get errorMessage => _errorMessage;
 
-  // --- Getters for Calculated Values ---
-  // It's better to calculate these on the fly to ensure they are always up to date.
+  // NEW: A smart getter for screen state. It returns 'empty' if filters result in no items.
+  ScreenState get screenState {
+    if (_baseScreenState != ScreenState.success) {
+      return _baseScreenState; // Return loading or error states immediately
+    }
+    // If base state is success, check if the *filtered* list is empty
+    return transactions.isEmpty ? ScreenState.empty : ScreenState.success;
+  }
+
+  // --- Main Getter for the UI to display transactions ---
+  // This getter dynamically applies the filters to the master list.
+  List<TransactionModel> get transactions {
+    return _allTransactions.where((transaction) {
+      final typeMatch = _selectedTypeFilter == null || transaction.type == _selectedTypeFilter;
+      final categoryMatch = _selectedCategoryFilter == null || transaction.category == _selectedCategoryFilter;
+      return typeMatch && categoryMatch;
+    }).toList();
+  }
+
+  // NEW: A getter to provide a unique list of all available categories for the filter UI
+  Set<String> get availableCategories {
+    return _allTransactions.map((t) => t.category).toSet();
+  }
+
+  // --- Getters for Calculated Values (now work on the filtered list) ---
   double get totalCredit {
-    return _transactions
+    return transactions // Use the filtered list
         .where((t) => t.type == 'credit')
         .fold(0.0, (sum, item) => sum + item.amount);
   }
 
   double get totalDebit {
-    return _transactions
+    return transactions // Use the filtered list
         .where((t) => t.type == 'debit')
         .fold(0.0, (sum, item) => sum + item.amount);
   }
@@ -43,43 +70,51 @@ class TransactionProvider with ChangeNotifier {
   // --- Business Logic Methods ---
 
   TransactionProvider() {
-    // Fetch data immediately when the provider is created.
     fetchTransactions();
   }
 
   Future<void> fetchTransactions() async {
-    _screenState = ScreenState.loading;
-    notifyListeners(); // Notify UI to show loading indicator
+    _baseScreenState = ScreenState.loading;
+    // Clear filters on refresh
+    _selectedTypeFilter = null;
+    _selectedCategoryFilter = null;
+    notifyListeners();
 
     try {
-      final List<TransactionModel> fetchedTransactions = await TransactionAPI.fetchTransactions();
+      final fetchedTransactions = await TransactionAPI.fetchTransactions();
       fetchedTransactions.sort((a, b) => b.date.compareTo(a.date));
 
-      _transactions = fetchedTransactions;
-      _screenState = _transactions.isEmpty ? ScreenState.empty : ScreenState.success;
+      _allTransactions = fetchedTransactions;
+      _baseScreenState = _allTransactions.isEmpty ? ScreenState.empty : ScreenState.success;
     } on SocketException {
       _errorMessage = "No Internet Connection. Please try again.";
-      _screenState = ScreenState.error;
+      _baseScreenState = ScreenState.error;
     } catch (e) {
       _errorMessage = 'An error occurred: ${e.toString()}';
-      _screenState = ScreenState.error;
+      _baseScreenState = ScreenState.error;
     }
-    // Notify the UI that the state has changed (either to success, empty, or error)
     notifyListeners();
   }
 
   Future<void> addTransaction(TransactionModel transaction) async {
     try {
       final addedTransaction = await TransactionAPI.addTransaction(transaction);
-      // Add the new item to the top of the list
-      _transactions.insert(0, addedTransaction);
-      // If the list was empty, the state is now 'success'
-      _screenState = ScreenState.success;
-      // Notify listeners to rebuild the UI with the new item
+      _allTransactions.insert(0, addedTransaction);
+      _baseScreenState = ScreenState.success;
       notifyListeners();
     } catch (e) {
-      // If adding fails, re-throw the error so the UI can catch it and show a SnackBar
       throw Exception('Failed to add transaction: ${e.toString()}');
     }
+  }
+
+  // --- NEW: Methods to update filters ---
+  void updateTypeFilter(String? type) {
+    _selectedTypeFilter = type;
+    notifyListeners(); // Notify UI to rebuild with the new filter
+  }
+
+  void updateCategoryFilter(String? category) {
+    _selectedCategoryFilter = category;
+    notifyListeners(); // Notify UI to rebuild with the new filter
   }
 }
