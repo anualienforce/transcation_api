@@ -15,9 +15,7 @@ import '../widgets/transcation_item.dart';
 class TranscationScreen extends StatelessWidget {
   const TranscationScreen({super.key});
 
-  // Dialog method remains the same as before
   void _showAddTransactionDialog(BuildContext context) {
-    // ... (no changes needed in this method)
     final formKey = GlobalKey<FormState>();
     final titleController = TextEditingController();
     final amountController = TextEditingController();
@@ -154,7 +152,6 @@ class TranscationScreen extends StatelessWidget {
             case ScreenState.error:
               return ErrorApi(message: provider.errorMessage, onRetry: provider.fetchTransactions);
             case ScreenState.empty:
-            // Show filter controls even when empty, so user can clear filters
               return Column(
                 children: [
                   _buildFilterControls(context, provider),
@@ -164,7 +161,7 @@ class TranscationScreen extends StatelessWidget {
             case ScreenState.success:
               return RefreshIndicator(
                 onRefresh: provider.fetchTransactions,
-                child: Column( // Use a Column to stack filters and the list
+                child: Column( // Used a Column to stack filters and the list
                   children: [
 
                     Padding(
@@ -185,11 +182,10 @@ class TranscationScreen extends StatelessWidget {
                     ),
                     const Divider(height: 1),
 
-                    // --- NEW: Filter Controls Section ---
+
                     _buildFilterControls(context, provider),
                     const Divider(height: 1),
 
-                    // --- Transaction List Section ---
                     Expanded(
                       child: ListView.builder(
                         itemBuilder: (BuildContext context, int index) {

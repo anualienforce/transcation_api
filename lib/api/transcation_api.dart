@@ -1,13 +1,14 @@
 import 'dart:convert';
+import 'package:api_transcation/utils/constants.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/transcation_model.dart';
 
 
 class TransactionAPI {
-  static const baseUrl = 'https://687b36a4b4bc7cfbda84fe9b.mockapi.io/transcation';
+  static var baseUrl = Constants.KEY_URL;
 
-  static Future<List<TransactionModel>> fetchTransactions() async {
+  static Future<List<TransactionModel>> fetchTransactions() async {//GET method
     final res = await http.get(Uri.parse(baseUrl));
     if (res.statusCode == 200) {
       final List decoded = jsonDecode(res.body);
@@ -17,7 +18,7 @@ class TransactionAPI {
     }
   }
 
-  static Future<TransactionModel> addTransaction(TransactionModel data) async {
+  static Future<TransactionModel> addTransaction(TransactionModel data) async {//POST method
     final res = await http.post(
       Uri.parse(baseUrl),
       headers: {'Content-Type': 'application/json'},

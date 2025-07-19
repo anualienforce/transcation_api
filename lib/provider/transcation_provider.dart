@@ -9,34 +9,28 @@ import '../models/transcation_model.dart';
 enum ScreenState { loading, success, empty, error }
 
 class TransactionProvider with ChangeNotifier {
-  // --- Private State Variables ---
+
   List<TransactionModel> _allTransactions = []; // Holds ALL transactions from the API
   ScreenState _baseScreenState = ScreenState.loading;
   String _errorMessage = '';
 
-  // --- NEW: Filter State Variables ---
+
   String? _selectedTypeFilter; // null means 'All'
   String? _selectedCategoryFilter; // null means 'All'
 
 
-  // --- Public Getters for UI to read state ---
 
-  // NEW: Expose the current filter values so the UI can highlight the active filter
   String? get selectedTypeFilter => _selectedTypeFilter;
   String? get selectedCategoryFilter => _selectedCategoryFilter;
   String get errorMessage => _errorMessage;
 
-  // NEW: A smart getter for screen state. It returns 'empty' if filters result in no items.
   ScreenState get screenState {
     if (_baseScreenState != ScreenState.success) {
       return _baseScreenState; // Return loading or error states immediately
     }
-    // If base state is success, check if the *filtered* list is empty
     return transactions.isEmpty ? ScreenState.empty : ScreenState.success;
   }
 
-  // --- Main Getter for the UI to display transactions ---
-  // This getter dynamically applies the filters to the master list.
   List<TransactionModel> get transactions {
     return _allTransactions.where((transaction) {
       final typeMatch = _selectedTypeFilter == null || transaction.type == _selectedTypeFilter;
@@ -45,12 +39,10 @@ class TransactionProvider with ChangeNotifier {
     }).toList();
   }
 
-  // NEW: A getter to provide a unique list of all available categories for the filter UI
   Set<String> get availableCategories {
     return _allTransactions.map((t) => t.category).toSet();
   }
 
-  // --- Getters for Calculated Values (now work on the filtered list) ---
   double get totalCredit {
     return transactions // Use the filtered list
         .where((t) => t.type == 'credit')
@@ -67,15 +59,12 @@ class TransactionProvider with ChangeNotifier {
     return totalCredit - totalDebit;
   }
 
-  // --- Business Logic Methods ---
-
   TransactionProvider() {
     fetchTransactions();
   }
 
   Future<void> fetchTransactions() async {
     _baseScreenState = ScreenState.loading;
-    // Clear filters on refresh
     _selectedTypeFilter = null;
     _selectedCategoryFilter = null;
     notifyListeners();
@@ -107,7 +96,7 @@ class TransactionProvider with ChangeNotifier {
     }
   }
 
-  // --- NEW: Methods to update filters ---
+  
   void updateTypeFilter(String? type) {
     _selectedTypeFilter = type;
     notifyListeners(); // Notify UI to rebuild with the new filter
